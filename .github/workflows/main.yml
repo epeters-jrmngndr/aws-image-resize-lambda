@@ -1,0 +1,20 @@
+name: Deploy lambda 
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: deployment
+    steps:
+    - uses: actions/checkout@master
+    - name: zip code 
+      run: zip lambda_handler.zip lambda_function.py
+    - name: aws configure
+      run: aws --profile default configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }} && aws --profile default configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+    - name: S3 Sync
+      run: aws lambda update-function-code --function-name imageResize --zip-file fileb://lambda_handler.zip --output text --region us-east-1
